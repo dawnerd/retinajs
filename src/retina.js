@@ -107,7 +107,7 @@
 
   function RetinaImage(el) {
     this.el = el;
-    this.path = new RetinaImagePath(this.el.getAttribute('src'), this.el.getAttribute('data-at2x'));
+    this.path = new RetinaImagePath(this.el.getAttribute('src'), this.el.getAttribute('data-retina'));
     var that = this;
     this.path.check_2x_variant(function(hasVariant) {
       if (hasVariant) that.swap();
