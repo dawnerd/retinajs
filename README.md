@@ -10,7 +10,7 @@ retina.js makes it easy to serve high-resolution images to devices with retina d
 
 When your users load a page, retina.js checks each image on the page to see if there is a high-resolution version of that image on your server. If a high-resolution variant exists, the script will swap in that image in-place.
 
-The script assumes you use Apple's prescribed high-resolution modifier (@2x) to denote high-resolution image variants on your server. It is also possible to override this by manually specifying the URL for the @2x images using `data-at2x` attributes.
+The script assumes you use Apple's prescribed high-resolution modifier (@2x) to denote high-resolution image variants on your server. It is also possible to override this by manually specifying the URL for the @2x images using `data-retina` attributes.
 
 For example, if you have an image on your page that looks like this:
 
@@ -25,7 +25,7 @@ The script will check your server to see if an alternative image exists at this 
 However, if you have:
 
 ```html
-    <img src="/images/my_image.png" data-at2x="http://example.com/my_image@2x.png" />
+    <img src="/images/my_image.png" data-retina="http://example.com/my_image@2x.png" />
 ```
 
 The script will use `http://example.com/my_image@2x.png` as the high-resolution image. No checks to the server will be performed.
@@ -45,12 +45,12 @@ The JavaScript helper script automatically replaces images on your page with hig
 
 ###LESS
 
-The LESS CSS mixin is a helper for applying high-resolution background images in your stylesheet. You provide it with an image path and the dimensions of the original-resolution image. The mixin creates a media query specifically for Retina displays, changes the background image for the selector elements to use the high-resolution (@2x) variant and applies a background-size of the original image in order to maintain proper dimensions. To use it, download the mixin, import or include it in your LESS stylesheet, and apply it to elements of your choice.
+The LESS CSS mixin is a helper for applying high-resolution background images in your stylesheet. You provide it with an image path and the dimensions of the original-resolution image. You may also pass a third parameter if you need to add anything else to the css (pretty much only !important). The mixin creates a media query specifically for Retina displays, changes the background image for the selector elements to use the high-resolution (@2x) variant and applies a background-size of the original image in order to maintain proper dimensions. To use it, download the mixin, import or include it in your LESS stylesheet, and apply it to elements of your choice.
 
 *Syntax:*
 
 ``` less
-.at2x(@path, [optional] @width: auto, [optional] @height: auto);
+.at2x(@path, [optional] @width: auto, [optional] @height: auto, [optional] @additional: '');
 ```
 
 *Steps:*
@@ -87,7 +87,7 @@ Will compile to:
 
 The problem with this is that the high-resolution version would have a different hash, and would not conform the usual pattern, i.e. `/images/image@2x-{hash2}.jpg`. So automatic detection would fail because retina.js would check the existence of `/images/image-{hash1}@2x.jpg`.
 
-There's no way for retina.js to know beforehand what the high-resolution image's hash would be without some sort of help from the server side. So in this case, the suggested method is to supply the high-resolution URLs using the `data-at2x` attributes as previously described in the How It Works section.
+There's no way for retina.js to know beforehand what the high-resolution image's hash would be without some sort of help from the server side. So in this case, the suggested method is to supply the high-resolution URLs using the `data-retina` attributes as previously described in the How It Works section.
 
 In Rails, one way to automate this is using a helper, e.g.:
 
@@ -95,7 +95,7 @@ In Rails, one way to automate this is using a helper, e.g.:
     # in app/helpers/some_helper.rb or app/helpers/application_helper.rb
     def image_tag_with_at2x(name_at_1x, options={})
       name_at_2x = name_at_1x.gsub(%r{\.\w+$}, '@2x\0')
-      image_tag(name_at_1x, options.merge("data-at2x" => asset_path(name_at_2x)))
+      image_tag(name_at_1x, options.merge("data-retina" => asset_path(name_at_2x)))
     end
 ```
 
@@ -108,7 +108,7 @@ And then in your views (templates), instead of using image_tag, you would use im
 It would generate something like:
 
 ```html
-  <img src="logo-{hash1}.png" data-at2x="logo@2x-{hash2}.png" />
+  <img src="logo-{hash1}.png" data-retina="logo@2x-{hash2}.png" />
 ```
 
 ##How to test
